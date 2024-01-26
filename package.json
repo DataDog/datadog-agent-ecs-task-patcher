@@ -1,0 +1,18 @@
+{
+  "name": "cws-fargate-td-patcher",
+  "version": "1.0.0",
+  "description": "CWS Fargate task definition patcher",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Sylvain Afchain",
+  "license": "Apache-2.0",
+  "bin": {
+    "cws-fargate-td-patcher": "./index.js"
+  },
+  "dependencies": {
+    "yargs": "13.2"
+  },
+  "type": "module"
+}
