@@ -152,7 +152,6 @@ function patchContainerEntryPoint(spec, entryPoint = [], verbose = false) {
     }
 }
 
-// pull the image and patch the entry point
 function patchContainerMounts(spec, verbose = false) {
     if (verbose) {
         console.log("💾 patch container mounts");
@@ -168,6 +167,14 @@ function patchContainerMounts(spec, verbose = false) {
         spec.volumeMounts = [];
     }
     spec.volumeMounts.push(JSON.parse(def));
+}
+
+function patchPidMode(spec, verbose = false) {
+    if (verbose) {
+        console.log("🔄 patch pid mode");
+    }
+
+    spec.shareProcessNamespace = true
 }
 
 export function PatchDeployment(deployment, apiKey, site, service = "", entryPoint = [], agentImg = "", cwsInstImg = "", ctnrNames = [], verbose = false) {
@@ -188,6 +195,9 @@ export function PatchDeployment(deployment, apiKey, site, service = "", entryPoi
 
     // add cws intrumentation volume
     addVolumes(deployment.spec.template.spec, verbose);
+
+    // add pid mode
+    patchPidMode(deployment.spec.template.spec, verbose);
 
     for (let container of deployment.spec.template.spec.containers) {
         if (container.name === datadogAgentContainerName || container.name === cwsInstrumentationInitContainerName) {

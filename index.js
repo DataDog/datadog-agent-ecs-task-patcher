@@ -5,7 +5,7 @@ import { readFile, writeFile } from 'node:fs';
 import { PatchRawTaskDef } from "./src/ecs/patcher.js";
 import { PatchRawDeployment } from "./src/eks/patcher.js";
 
-const options = yargs.usage("Usage: -k <api key>")
+const options = yargs.usage("Usage: -a <api key> -e '[<entry point>]'")
     .option("a", { alias: "apiKey", describe: "API key", type: "string", demandOption: false })
     .option("s", { alias: "site", describe: "site", type: "string", demandOption: false, default: "datadoghq.com" })
     .option("i", { alias: "input", describe: "input file", type: "string", demandOption: false })
@@ -16,7 +16,7 @@ const options = yargs.usage("Usage: -k <api key>")
     .option("e", { alias: "entryPoint", describe: "entry point argument", type: "string", demandOption: false, default: "/init.sh" })
     .option("d", { alias: "agentImage", describe: "datadog agent image", type: "string", demandOption: false, default: "datadog/agent:latest" })
     .option("c", { alias: "cwsInstImage", describe: "cws-instrumentation image", type: "string", demandOption: false, default: "datadog/cws-instrumentation:latest" })
-    .option("k", { alias: "eks", describe: "eks deployment mode", type: "bool", demandOption: false, default: "false" })
+    .option("k", { alias: "eks", describe: "eks deployment mode", type: "bool", demandOption: false })
     .wrap(yargs.terminalWidth())
     .argv;
 

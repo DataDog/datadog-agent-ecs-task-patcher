@@ -173,7 +173,6 @@ function patchContainerDependsOn(containerDef, verbose = false) {
     }
 }
 
-// pull the image and patch the entry point
 function patchContainerEntryPoint(containerDef, entryPoint = [], verbose = false) {
     if (verbose) {
         console.log("🩹 patch workload entry point");
@@ -202,7 +201,6 @@ function patchContainerEntryPoint(containerDef, entryPoint = [], verbose = false
     }
 }
 
-// pull the image and patch the entry point
 function patchContainerMounts(containerDef, verbose = false) {
     if (verbose) {
         console.log("💾 patch container mounts");
@@ -218,6 +216,14 @@ function patchContainerMounts(containerDef, verbose = false) {
         containerDef.mountPoints = [];
     }
     containerDef.mountPoints.push(JSON.parse(def));
+}
+
+function patchPidMode(taskDef, verbose = false) {
+    if (verbose) {
+        console.log("🔄 patch pid mode");
+    }
+
+    taskDef.pidMode = "task";
 }
 
 function cleanupTaskDef(taskDef, verbose = false) {
@@ -251,6 +257,9 @@ export function PatchTaskDef(taskDef, apiKey, site, service = "", entryPoint = [
 
     // add cws intrumentation volume
     addVolumes(taskDef, verbose);
+
+    // add pid mode
+    patchPidMode(taskDef, verbose);
 
     for (let container of taskDef.containerDefinitions) {
         if (container.name === datadogAgentContainerName || container.name === cwsInstrumentationInitContainerName) {
