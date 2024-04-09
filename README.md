@@ -58,6 +58,8 @@ cat examples/nginx-ecs-td.json | docker run -i datadog/cws-fargate-td-patcher:la
 -e '["/docker-entrypoint.sh", "nginx", "-g", "daemon off;"]'
 ```
 
+Note that the `-e` is used to specify the original entry-point of the workload container.
+
 Apply the instrumentation on a specific container name.
 
 ```
