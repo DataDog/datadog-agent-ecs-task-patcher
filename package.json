@@ -12,6 +12,7 @@
     "cws-fargate-td-patcher": "./index.js"
   },
   "dependencies": {
+    "yaml": "^2.4.1",
     "yargs": "13.2"
   },
   "type": "module"

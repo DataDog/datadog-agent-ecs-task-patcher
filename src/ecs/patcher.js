@@ -1,9 +1,14 @@
-import { execSync } from 'node:child_process';
+// Unless explicitly stated otherwise all files in this repository are licensed
+// under the Apache License Version 2.0.
+// This product includes software developed at Datadog (https://www.datadoghq.com/).
+// Copyright 2016-present Datadog, Inc.
+
+import YAML from 'yaml'
+import { RetrieveEntrypoint } from "../utils.js";
 
 const defaultSite = 'datadoghq.com';
 const defaultDDAgentImg = 'datadog/agent:latest';
 const defaultCwsInstImg = 'datadog/cws-instrumentation:latest';
-
 
 const datadogAgentContainerName = 'datadog-agent'
 const cwsInstrumentationInitContainerName = 'cws-instrumentation-init'
@@ -59,7 +64,7 @@ function addDatadogSidecar(containersDef, apiKey, site, service = "", ddAgentImg
     }`;
 
     for (let container of containersDef) {
-        if (container.name === "datadog-agent") {
+        if (container.name === datadogAgentContainerName) {
             // already patched or defined, stop here
             return;
         }
@@ -105,21 +110,14 @@ function addVolumes(taskDef, verbose = false) {
         console.log("💾 prepare CWS Instrumentation volume");
     }
 
-    let def = `[
-        {
-            "name": "cws-instrumentation-volume"
-        }
-    ]`
+    let def = `{
+        "name": "cws-instrumentation-volume"
+    }`;
 
-    let volumes = JSON.parse(def);
-
-    if ('volumes' in taskDef) {
-        for (let volume of volumes) {
-            taskDef.volumes.push(volume);
-        }
-    } else {
-        taskDef['volumes'] = volumes;
+    if (!("volumes" in taskDef)) {
+        taskDef.volumes = [];
     }
+    taskDef.volumes.push(JSON.parse(def));
 }
 
 function patchContainerCaps(containerDef, verbose = false) {
@@ -175,24 +173,6 @@ function patchContainerDependsOn(containerDef, verbose = false) {
     }
 }
 
-function retrieveEntrypoint(containerDef, verbose = false) {
-    if (verbose) {
-        console.log("🛜 retrieve entry point from docker image");
-    }
-
-    let image = containerDef.image;
-
-    execSync(`docker pull ${image}`, (err) => {
-        if (err) {
-            console.error("could not execute command: ", err)
-            return
-        }
-    })
-
-    let output = execSync(`docker inspect ${image} -f '{{json .Config.Entrypoint}}'`).toString();
-    return JSON.parse(output);
-}
-
 // pull the image and patch the entry point
 function patchContainerEntryPoint(containerDef, entryPoint = [], verbose = false) {
     if (verbose) {
@@ -201,7 +181,7 @@ function patchContainerEntryPoint(containerDef, entryPoint = [], verbose = false
 
     if (!('entryPoint' in containerDef)) {
         if (entryPoint.length == 0) {
-            entryPoint = retrieveEntrypoint(containerDef, verbose)
+            entryPoint = RetrieveEntrypoint(containerDef.image, verbose)
         }
 
         let def = `[
@@ -228,23 +208,16 @@ function patchContainerMounts(containerDef, verbose = false) {
         console.log("💾 patch container mounts");
     }
 
-    let def = `[
-        {
-            "sourceVolume": "cws-instrumentation-volume",
-            "containerPath": "/cws-instrumentation-volume",
-            "readOnly": true
-        }
-    ]`
+    let def = `{
+        "sourceVolume": "cws-instrumentation-volume",
+        "containerPath": "/cws-instrumentation-volume",
+        "readOnly": true
+    }`;
 
-    let mounts = JSON.parse(def);
-
-    if ('mountPoints' in containerDef) {
-        for (let mount of mounts) {
-            containerDef.mountPoints.push(mount);
-        }
-    } else {
-        containerDef['mountPoints'] = mounts;
+    if (!("mountPoints" in spec)) {
+        spec.mountPoints = [];
     }
+    spec.mountPoints.push(JSON.parse(def));
 }
 
 function cleanupTaskDef(taskDef, verbose = false) {
@@ -261,7 +234,7 @@ function cleanupTaskDef(taskDef, verbose = false) {
     delete taskDef.requiresAttributes;
 }
 
-export function PatchTaskDef(taskDef, apiKey, site, service = "", entryPoint = [], agentImg = "", cwsInstImg = "", verbose = false) {
+export function PatchTaskDef(taskDef, apiKey, site, service = "", entryPoint = [], agentImg = "", cwsInstImg = "", ctnrNames = [], verbose = false) {
     if (!site) {
         site = defaultSite;
     }
@@ -284,6 +257,10 @@ export function PatchTaskDef(taskDef, apiKey, site, service = "", entryPoint = [
             continue;
         }
 
+        if (ctnrNames.length > 0 && !ctnrNames.includes(container.name)) {
+            continue;
+        }
+
         patchContainerCaps(container, verbose);
         patchContainerDependsOn(container, verbose);
         patchContainerEntryPoint(container, entryPoint, verbose);
@@ -296,7 +273,22 @@ export function PatchTaskDef(taskDef, apiKey, site, service = "", entryPoint = [
     return taskDef
 }
 
-export function PatchRawTaskDef(rawTaskDef, apiKey, site, service, entryPoint = [], agentImg = "", cwsInstImg = "", verbose = false) {
-    let taskDef = JSON.parse(rawTaskDef);
-    return JSON.stringify(PatchTaskDef(taskDef, apiKey, site, service, entryPoint, agentImg, cwsInstImg, verbose), null, 4);
+export function PatchRawTaskDef(rawTaskDef, apiKey, site, service, entryPoint = [], agentImg = "", cwsInstImg = "", ctnrNames = [], verbose = false) {
+    let taskDef;
+    let json = false;
+
+    try {
+        taskDef = JSON.parse(rawTaskDef);
+        json = true
+    } catch (e) {
+        taskDef = YAML.parse(rawTaskDef);
+    }
+
+    let result = PatchTaskDef(taskDef, apiKey, site, service, entryPoint, agentImg, cwsInstImg, ctnrNames, verbose);
+
+    if (json) {
+        return JSON.stringify(result, null, 4);
+    }
+
+    return YAML.stringify(result, null, 4);
 }

@@ -8,16 +8,43 @@ This tool can be used to patch existing task definition in order to integrate th
 docker build . -t datadog/cws-fargate-td-patcher:latest
 ```
 
-## Usage
+## How to use
+
+### Usage
 
 ```
 docker run -i datadog/cws-fargate-td-patcher:latest \
 cws-fargate-td-patcher --help
 ```
 
-## Patch example
+####
+
+
+### ECS example
+
+#### nginx
+
+Apply the instrumentation on all the containers.
 
 ```
-cat nginx-task-def.json | docker run -i datadog/cws-fargate-td-patcher:latest \
-cws-fargate-td-patcher -k <API-KEY> -s datadoghq.com -e /docker-entrypoint.sh -n nginx
+cat examples/nginx-ecs-td.json | docker run -i datadog/cws-fargate-td-patcher:latest cws-fargate-td-patcher -a <API-KEY> \
+-e /docker-entrypoint.sh nginx -g "daemon off;"
 ```
+
+Apply the instrumentation on a specific container name.
+
+```
+ cat examples/nginx-ecs-td.json | docker run -i datadog/cws-fargate-td-patcher:latest cws-fargate-td-patcher -a <API-KEY> \
+ -p nginx -e /docker-entrypoint.sh nginx -g "daemon off;"
+ ```
+
+ ### EKS example
+
+ ### nginx
+
+ Apply the instrumentation on all the containers.
+
+ ```
+ cat examples/nginx-eks.yaml | docker run -i datadog/cws-fargate-td-patcher:latest cws-fargate-td-patcher -k -a <API-KEY> \
+-e /docker-entrypoint.sh nginx -g "daemon off;"
+ ```
