@@ -13,7 +13,7 @@ const options = yargs.usage("Usage: -k <api key>")
     .option("v", { alias: "verbose", describe: "verbose mode", type: "boolean", demandOption: false })
     .option("n", { alias: "service", describe: "service name", type: "string", demandOption: false })
     .option("p", { alias: "containers", describe: "container names to patch", type: "string", array: true, demandOption: false })
-    .option("e", { alias: "entryPoint", describe: "entry point argument", type: "string", array: true, demandOption: false, default: "/init.sh" })
+    .option("e", { alias: "entryPoint", describe: "entry point argument", type: "string", demandOption: false, default: "/init.sh" })
     .option("d", { alias: "agentImage", describe: "datadog agent image", type: "string", demandOption: false, default: "datadog/agent:latest" })
     .option("c", { alias: "cwsInstImage", describe: "cws-instrumentation image", type: "string", demandOption: false, default: "datadog/cws-instrumentation:latest" })
     .option("k", { alias: "eks", describe: "eks deployment mode", type: "bool", demandOption: false, default: "false" })
@@ -28,6 +28,8 @@ readFile(pathOrStdin, 'utf8', (err, rawData) => {
         return;
     }
 
+    let entryPoint = JSON.parse(options.entryPoint);
+
     let output = "";
 
     if (options.eks) {
@@ -35,18 +37,18 @@ readFile(pathOrStdin, 'utf8', (err, rawData) => {
             options.apiKey,
             options.site,
             options.service,
-            options.entryPoint,
+            entryPoint,
             options.ddAgentImage,
             options.ddCwsInstImage,
             options.containers,
             options.verbose
         );
     } else {
-        output = PatchRawTaskDef(rawTaskDef,
+        output = PatchRawTaskDef(rawData,
             options.apiKey,
             options.site,
             options.service,
-            options.entryPoint,
+            entryPoint,
             options.ddAgentImage,
             options.ddCwsInstImage,
             options.containers,

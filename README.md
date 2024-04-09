@@ -28,14 +28,14 @@ Apply the instrumentation on all the containers.
 
 ```
 cat examples/nginx-ecs-td.json | docker run -i datadog/cws-fargate-td-patcher:latest cws-fargate-td-patcher -a <API-KEY> \
--e /docker-entrypoint.sh nginx -g "daemon off;"
+-e '["/docker-entrypoint.sh", "nginx", "-g", "daemon off;"]
 ```
 
 Apply the instrumentation on a specific container name.
 
 ```
- cat examples/nginx-ecs-td.json | docker run -i datadog/cws-fargate-td-patcher:latest cws-fargate-td-patcher -a <API-KEY> \
- -p nginx -e /docker-entrypoint.sh nginx -g "daemon off;"
+ cat examples/nginx-ecs-td.json | docker run -i datadog/cws-fargate-td-patcher:latest cws-fargate-td-patcher -a <API-KEY> -p nginx
+-e '["/docker-entrypoint.sh", "nginx", "-g", "daemon off;"]
  ```
 
  ### EKS example
@@ -46,5 +46,5 @@ Apply the instrumentation on a specific container name.
 
  ```
  cat examples/nginx-eks.yaml | docker run -i datadog/cws-fargate-td-patcher:latest cws-fargate-td-patcher -k -a <API-KEY> \
--e /docker-entrypoint.sh nginx -g "daemon off;"
+-e '["/docker-entrypoint.sh", "nginx", "-g", "daemon off;"]'
  ```

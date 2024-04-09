@@ -214,10 +214,10 @@ function patchContainerMounts(containerDef, verbose = false) {
         "readOnly": true
     }`;
 
-    if (!("mountPoints" in spec)) {
-        spec.mountPoints = [];
+    if (!("mountPoints" in containerDef)) {
+        containerDef.mountPoints = [];
     }
-    spec.mountPoints.push(JSON.parse(def));
+    containerDef.mountPoints.push(JSON.parse(def));
 }
 
 function cleanupTaskDef(taskDef, verbose = false) {
@@ -280,7 +280,7 @@ export function PatchRawTaskDef(rawTaskDef, apiKey, site, service, entryPoint = 
     try {
         taskDef = JSON.parse(rawTaskDef);
         json = true
-    } catch (e) {
+    } catch {
         taskDef = YAML.parse(rawTaskDef);
     }
 

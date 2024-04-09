@@ -212,7 +212,7 @@ export function PatchRawDeployment(rawDeployment, apiKey, site, service, entryPo
     try {
         deployment = JSON.parse(rawDeployment);
         json = true
-    } catch (e) {
+    } catch {
         deployment = YAML.parse(rawDeployment);
     }
 

@@ -15,5 +15,9 @@
     "yaml": "^2.4.1",
     "yargs": "13.2"
   },
-  "type": "module"
+  "type": "module",
+  "devDependencies": {
+    "@eslint/js": "^9.0.0",
+    "eslint": "^9.0.0"
+  }
 }
