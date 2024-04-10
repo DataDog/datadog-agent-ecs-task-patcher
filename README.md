@@ -2,6 +2,8 @@
 
 This tool can be used to patch existing task definition in order to integrate the Datadog Agent as a side car and to apply the CWS instrumentation to the application.
 
+⚠️ **This tool is not production ready yet, please review carefully the generated output.**
+
 ## Build docker image
 
 ```
