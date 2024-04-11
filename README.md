@@ -33,7 +33,7 @@ docker run -i datadog/cws-fargate-td-patcher:latest cws-fargate-td-patcher [OPTI
 | `-v`, `--verbose` | | Enable verbose mode |
 | `-n`, `--service` | | Service name |
 | `-p`, `--containers` | | Container names to patch |
-| `-e`, `--entryPoint` | `/init.sh` | Entry point argument |
+| `-e`, `--entryPoint` | `/init.sh` | Entry point arguments |
 | `-d`, `--agentImage` | `datadog/agent:latest` | Datadog Agent image |
 | `-c`, `--cwsInstImage` | `datadog/cws-instrumentation:latest` | CWS instrumentation image |
 | `-k`, `--eks` | | Enable EKS deployment mode |
