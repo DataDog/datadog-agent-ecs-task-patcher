@@ -1,79 +1,77 @@
 # cws-fargate-td-patcher
 
-This tool can be used to patch existing task definition in order to integrate the Datadog Agent as a side car and to apply the CWS instrumentation to the application.
+> **Warning**: This tool is not production-ready. Carefully review the generated output.
 
-⚠️ **This tool is not production ready yet, please review carefully the generated output.**
+The `cws-fargate-td-patcher` is a tool that patches existing task definitions to integrate the Datadog Agent as a sidecar and apply Cloud Workload Security (CWS) instrumentation to your application.
 
-## Build docker image
+## Build the Docker image
+
+To build the Docker image, run:
 
 ```
 docker build . -t datadog/cws-fargate-td-patcher:latest
 ```
 
-## How to use
+## Usage
 
-### Usage
+To use `cws-fargate-td-patcher`, run:
 
 ```
-docker run -i datadog/cws-fargate-td-patcher:latest \
-cws-fargate-td-patcher --help
-
-Usage: -a <api key> -e '[<entry point>]'
-
-Options:
-  --help              Show help  [boolean]
-  --version           Show version number  [boolean]
-  -a, --apiKey        API key  [string]
-  -s, --site          site  [string] [default: "datadoghq.com"]
-  -i, --input         input file  [string]
-  -o, --ouput         output file  [string]
-  -v, --verbose       verbose mode  [boolean]
-  -n, --service       service name  [string]
-  -p, --containers    container names to patch  [array]
-  -e, --entryPoint    entry point argument  [string] [default: "/init.sh"]
-  -d, --agentImage    datadog agent image  [string] [default: "datadog/agent:latest"]
-  -c, --cwsInstImage  cws-instrumentation image  [string] [default: "datadog/cws-instrumentation:latest"]
-  -k, --eks           eks deployment mode
+docker run -i datadog/cws-fargate-td-patcher:latest cws-fargate-td-patcher [OPTIONS]
 ```
 
-## How does it work
+### Options
 
-The following modification are applied to the task definition or the deployment.
+| Option | Default | Description |
+| --- | --- | --- |
+| `--help` | | Show help |
+| `--version` | | Show version number |
+| `-a`, `--apiKey` | | **(Required)** Datadog API key |
+| `-s`, `--site` | `datadoghq.com` | Datadog site |
+| `-i`, `--input` | | Path to the input file |
+| `-o`, `--output` | | Path to the output file |
+| `-v`, `--verbose` | | Enable verbose mode |
+| `-n`, `--service` | | Service name |
+| `-p`, `--containers` | | Container names to patch |
+| `-e`, `--entryPoint` | `/init.sh` | Entry point argument |
+| `-d`, `--agentImage` | `datadog/agent:latest` | Datadog Agent image |
+| `-c`, `--cwsInstImage` | `datadog/cws-instrumentation:latest` | CWS instrumentation image |
+| `-k`, `--eks` | | Enable EKS deployment mode |
 
-1. Add the Datadog Agent Sidecar
-2. Add the CWS-Instrumentation init container
-3. Add a volume which is used to share the `cws-instrumentation` binary
-4. Patch the original workload container to :
-    1. Add the `cws-instrumentation` volume.
-    2. Wrap the entry-point of the application with the `cws-instrumentation` binary.
+## How it works
+
+The `cws-fargate-td-patcher` makes the following modifications to the task definition or deployment:
+
+1. Adds the Datadog Agent as a sidecar container.
+2. Adds the CWS instrumentation init container.
+3. Adds a volume to share the `cws-instrumentation` binary.
+4. Patches the original workload container to:
+    - Add the `cws-instrumentation` volume.
+    - Wrap the application's entry point with the `cws-instrumentation` binary.
 
 ## Examples
 
-### ECS example
+### ECS with Nginx
 
-#### nginx
-
-Apply the instrumentation on all the containers.
+To apply the instrumentation to all containers:
 
 ```
 cat examples/nginx-ecs-td.json | docker run -i datadog/cws-fargate-td-patcher:latest cws-fargate-td-patcher -a <API-KEY> \
 -e '["/docker-entrypoint.sh", "nginx", "-g", "daemon off;"]'
 ```
 
-Note that the `-e` is used to specify the original entry-point of the workload container.
+The `-e` flag specifies the workload container's original entry point.
 
-Apply the instrumentation on a specific container name.
+To apply the instrumentation to a specific container:
 
-```
+ ```
  cat examples/nginx-ecs-td.json | docker run -i datadog/cws-fargate-td-patcher:latest cws-fargate-td-patcher -a <API-KEY> -p nginx \
 -e '["/docker-entrypoint.sh", "nginx", "-g", "daemon off;"]'
  ```
 
- ### EKS Deployment example
+ ### EKS deployment with Nginx
 
- ### nginx
-
- Apply the instrumentation on all the containers.
+To apply the instrumentation to all containers:
 
  ```
  cat examples/nginx-eks.yaml | docker run -i datadog/cws-fargate-td-patcher:latest cws-fargate-td-patcher -k -a <API-KEY> \
