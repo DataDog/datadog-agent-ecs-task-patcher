@@ -38,8 +38,8 @@ readFile(pathOrStdin, 'utf8', (err, rawData) => {
             options.site,
             options.service,
             entryPoint,
-            options.ddAgentImage,
-            options.ddCwsInstImage,
+            options.agentImage,
+            options.cwsInstImage,
             options.containers,
             options.verbose
         );
@@ -49,8 +49,8 @@ readFile(pathOrStdin, 'utf8', (err, rawData) => {
             options.site,
             options.service,
             entryPoint,
-            options.ddAgentImage,
-            options.ddCwsInstImage,
+            options.agentImage,
+            options.cwsInstImage,
             options.containers,
             options.verbose
         );
