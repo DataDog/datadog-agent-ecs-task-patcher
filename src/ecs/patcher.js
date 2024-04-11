@@ -35,7 +35,7 @@ function addDatadogSidecar(containersDef, apiKey, site, service = "", ddAgentImg
                 "value": "${site}"
             },
             {
-                "name": "DD_EKS_FARGATE",
+                "name": "ECS_FARGATE",
                 "value": "true"
             },
             {
