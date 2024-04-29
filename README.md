@@ -71,6 +71,8 @@ To apply the instrumentation to a specific container:
 
  ### EKS deployment with Nginx
 
+> **Warning**: Use the following [Agent RBAC deployment instruction](https://docs.datadoghq.com/integrations/eks_fargate/?tab=manual#aws-eks-fargate-rbac) before deploying the Agent as a sidecar.
+
 To apply the instrumentation to all containers:
 
  ```
