@@ -1,23 +1,23 @@
-# cws-fargate-td-patcher
+# datadog-agent-ecs-task-patcher
 
 > **Warning**: This tool is not production-ready. Carefully review the generated output.
 
-The `cws-fargate-td-patcher` is a tool that patches existing task definitions to integrate the Datadog Agent as a sidecar and apply Cloud Workload Security (CWS) instrumentation to your application.
+The `datadog-agent-ecs-task-patcher` is a tool that patches existing task definitions to integrate the Datadog Agent as a sidecar and apply Cloud Workload Security (CWS) instrumentation to your application.
 
 ## Build the Docker image
 
 To build the Docker image, run:
 
 ```
-docker build . -t datadog/cws-fargate-td-patcher:latest
+docker build . -t datadog/datadog-agent-ecs-task-patcher:latest
 ```
 
 ## Usage
 
-To use `cws-fargate-td-patcher`, run:
+To use `datadog-agent-ecs-task-patcher`, run:
 
 ```
-docker run -i datadog/cws-fargate-td-patcher:latest cws-fargate-td-patcher [OPTIONS]
+docker run -i datadog/datadog-agent-ecs-task-patcher:latest datadog-agent-ecs-task-patcher [OPTIONS]
 ```
 
 ### Options
@@ -40,7 +40,7 @@ docker run -i datadog/cws-fargate-td-patcher:latest cws-fargate-td-patcher [OPTI
 
 ## How it works
 
-The `cws-fargate-td-patcher` makes the following modifications to the task definition or deployment:
+The `datadog-agent-ecs-task-patcher` makes the following modifications to the task definition or deployment:
 
 1. Adds the Datadog Agent as a sidecar container.
 2. Adds the CWS instrumentation init container.
@@ -56,7 +56,7 @@ The `cws-fargate-td-patcher` makes the following modifications to the task defin
 To apply the instrumentation to all containers:
 
 ```
-cat examples/nginx-ecs-td.json | docker run -i datadog/cws-fargate-td-patcher:latest cws-fargate-td-patcher -a <API-KEY> \
+cat examples/nginx-ecs-td.json | docker run -i datadog/datadog-agent-ecs-task-patcher:latest datadog-agent-ecs-task-patcher -a <API-KEY> \
 -e '["/docker-entrypoint.sh", "nginx", "-g", "daemon off;"]'
 ```
 
@@ -65,7 +65,7 @@ The `-e` flag specifies the workload container's original entry point.
 To apply the instrumentation to a specific container:
 
  ```
- cat examples/nginx-ecs-td.json | docker run -i datadog/cws-fargate-td-patcher:latest cws-fargate-td-patcher -a <API-KEY> -p nginx \
+ cat examples/nginx-ecs-td.json | docker run -i datadog/datadog-agent-ecs-task-patcher:latest datadog-agent-ecs-task-patcher -a <API-KEY> -p nginx \
 -e '["/docker-entrypoint.sh", "nginx", "-g", "daemon off;"]'
  ```
 
@@ -76,6 +76,6 @@ To apply the instrumentation to a specific container:
 To apply the instrumentation to all containers:
 
  ```
- cat examples/nginx-eks.yaml | docker run -i datadog/cws-fargate-td-patcher:latest cws-fargate-td-patcher -k -a <API-KEY> \
+ cat examples/nginx-eks.yaml | docker run -i datadog/datadog-agent-ecs-task-patcher:latest datadog-agent-ecs-task-patcher -k -a <API-KEY> \
 -e '["/docker-entrypoint.sh", "nginx", "-g", "daemon off;"]'
  ```
