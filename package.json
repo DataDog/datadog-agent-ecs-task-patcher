@@ -1,7 +1,7 @@
 {
-  "name": "cws-fargate-td-patcher",
+  "name": "datadog-agent-ecs-task-patcher",
   "version": "1.0.0",
-  "description": "CWS Fargate task definition patcher",
+  "description": "Datadog Agent ECS task definition patcher",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -9,7 +9,7 @@
   "author": "Sylvain Afchain",
   "license": "Apache-2.0",
   "bin": {
-    "cws-fargate-td-patcher": "./index.js"
+    "datadog-agent-ecs-task-patcher": "./index.js"
   },
   "dependencies": {
     "yaml": "^2.4.1",
