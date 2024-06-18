@@ -7,8 +7,8 @@ import YAML from 'yaml'
 import { RetrieveEntrypoint } from "../utils.js";
 
 const defaultSite = 'datadoghq.com';
-const defaultDDAgentImg = 'datadog/agent:latest';
-const defaultCwsInstImg = 'datadog/cws-instrumentation:latest';
+const defaultDDAgentImg = 'public.ecr.aws/datadog/agent:latest';
+const defaultCwsInstImg = 'public.ecr.aws/datadog/cws-instrumentation:latest';
 
 const datadogAgentContainerName = 'datadog-agent'
 const cwsInstrumentationInitContainerName = 'cws-instrumentation-init'
