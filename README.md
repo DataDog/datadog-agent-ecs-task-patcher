@@ -34,8 +34,8 @@ docker run -i datadog/datadog-agent-ecs-task-patcher:latest datadog-agent-ecs-ta
 | `-n`, `--service` | | Service name |
 | `-p`, `--containers` | | Container names to patch |
 | `-e`, `--entryPoint` | `/init.sh` | Entry point arguments |
-| `-d`, `--agentImage` | `datadog/agent:latest` | Datadog Agent image |
-| `-c`, `--cwsInstImage` | `datadog/cws-instrumentation:latest` | CWS instrumentation image |
+| `-d`, `--agentImage` | `public.ecr.aws/datadog/agent:latest` | Datadog Agent image |
+| `-c`, `--cwsInstImage` | `public.ecr.aws/datadog/cws-instrumentation:latest` | CWS instrumentation image |
 | `-k`, `--eks` | | Enable EKS deployment mode |
 
 ## How it works
