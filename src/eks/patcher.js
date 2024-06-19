@@ -4,7 +4,7 @@
 // Copyright 2016-present Datadog, Inc.
 
 import YAML from 'yaml'
-import { RetrieveEntrypoint } from "../utils.js";
+import { RetrieveEntrypoint, EnableCWS } from "../utils.js";
 
 const defaultSite = 'datadoghq.com';
 const defaultDDAgentImg = 'public.ecr.aws/datadog/agent:latest';
@@ -12,6 +12,18 @@ const defaultCwsInstImg = 'public.ecr.aws/datadog/cws-instrumentation:latest';
 
 const datadogAgentContainerName = 'datadog-agent'
 const cwsInstrumentationInitContainerName = 'cws-instrumentation-init'
+
+function enableCWS(containerDef, verbose = false) {
+    if (verbose) {
+        console.log("📦 enable CWS");
+    }
+
+    if (!('env' in containerDef)) {
+        containerDef['env'] = [];
+    }
+    
+    EnableCWS(containerDef['env']);
+}
 
 function addDatadogSidecar(spec, apiKey, site, service = "", ddAgentImg = "", verbose = false) {
     if (verbose) {
@@ -65,7 +77,7 @@ function addDatadogSidecar(spec, apiKey, site, service = "", ddAgentImg = "", ve
     for (let container of spec.containers) {
         if (container.name === datadogAgentContainerName) {
             // already patched or defined, stop here
-            return;
+            return enableCWS(container, verbose);
         }
     }
 

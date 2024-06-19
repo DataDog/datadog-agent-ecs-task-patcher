@@ -6,6 +6,28 @@
 
 import { execSync } from 'node:child_process';
 
+export function AddEnv(envs, name, value) {
+    let present = false;
+    for (let env of envs) {
+        if (env.name === name) {
+            env.value = "true";
+            present = true;
+            break;
+        }
+    }
+    if (!present) {
+        envs.push({
+            "name": name,
+            "value": "true"
+        });
+    }
+}
+
+export function EnableCWS(envs) {
+    AddEnv(envs, "DD_RUNTIME_SECURITY_CONFIG_ENABLED", "true");
+    AddEnv(envs, "DD_RUNTIME_SECURITY_CONFIG_EBPFLESS_ENABLED", "true");
+}
+
 export function RetrieveEntrypoint(image, verbose = false) {
     if (verbose) {
         console.log("🛜 retrieve entry point from docker image");
