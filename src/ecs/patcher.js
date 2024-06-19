@@ -164,7 +164,7 @@ function patchContainerDependsOn(containerDef, verbose = false) {
     }
 
     for (let dep of containerDef.dependsOn) {
-        if (datadogAgentContainerName in dep.containerName) {
+        if (datadogAgentContainerName === dep.containerName) {
             return;
         }
     }
@@ -308,8 +308,8 @@ export function PatchRawTaskDef(rawTaskDef, apiKey, site, service, entryPoint = 
     let result = PatchTaskDef(taskDef, apiKey, site, service, entryPoint, agentImg, cwsInstImg, ctnrNames, verbose);
 
     if (json) {
-        return JSON.stringify(result, null, 4);
+        return JSON.stringify(result, null, 2);
     }
 
-    return YAML.stringify(result, null, 4);
+    return YAML.stringify(result, null, 2);
 }

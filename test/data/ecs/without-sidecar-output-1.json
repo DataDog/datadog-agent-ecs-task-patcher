@@ -1,0 +1,128 @@
+{
+  "requiresCompatibilities": [
+    "FARGATE"
+  ],
+  "containerDefinitions": [
+    {
+      "name": "nginx",
+      "image": "nginx:latest",
+      "memory": 256,
+      "cpu": 256,
+      "essential": true,
+      "portMappings": [
+        {
+          "containerPort": 80,
+          "protocol": "tcp"
+        }
+      ],
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "awslogs-nginx-ecs",
+          "awslogs-region": "us-east-1",
+          "awslogs-stream-prefix": "ecs"
+        }
+      },
+      "linuxParameters": {
+        "capabilities": {
+          "add": [
+            "SYS_PTRACE"
+          ]
+        }
+      },
+      "dependsOn": [
+        {
+          "containerName": "datadog-agent",
+          "condition": "HEALTHY"
+        },
+        {
+          "containerName": "cws-instrumentation-init",
+          "condition": "SUCCESS"
+        }
+      ],
+      "entryPoint": [
+        "/cws-instrumentation-volume/cws-instrumentation",
+        "trace",
+        "--",
+        "/entry.sh"
+      ],
+      "mountPoints": [
+        {
+          "sourceVolume": "cws-instrumentation-volume",
+          "containerPath": "/cws-instrumentation-volume",
+          "readOnly": true
+        }
+      ]
+    },
+    {
+      "image": "public.ecr.aws/datadog/agent:latest",
+      "name": "datadog-agent",
+      "environment": [
+        {
+          "name": "DD_API_KEY",
+          "value": "aaa"
+        },
+        {
+          "name": "DD_SITE",
+          "value": "bbb"
+        },
+        {
+          "name": "ECS_FARGATE",
+          "value": "true"
+        },
+        {
+          "name": "DD_RUNTIME_SECURITY_CONFIG_ENABLED",
+          "value": "true"
+        },
+        {
+          "name": "DD_RUNTIME_SECURITY_CONFIG_EBPFLESS_ENABLED",
+          "value": "true"
+        },
+        {
+          "name": "DD_SERVICE",
+          "value": "ccc"
+        }
+      ],
+      "healthCheck": {
+        "command": [
+          "CMD-SHELL",
+          "/probe.sh"
+        ],
+        "interval": 30,
+        "timeout": 5,
+        "retries": 2,
+        "startPeriod": 60
+      }
+    },
+    {
+      "name": "cws-instrumentation-init",
+      "image": "public.ecr.aws/datadog/cws-instrumentation:latest",
+      "essential": false,
+      "user": "0",
+      "command": [
+        "/cws-instrumentation",
+        "setup",
+        "--cws-volume-mount",
+        "/cws-instrumentation-volume"
+      ],
+      "mountPoints": [
+        {
+          "sourceVolume": "cws-instrumentation-volume",
+          "containerPath": "/cws-instrumentation-volume",
+          "readOnly": false
+        }
+      ]
+    }
+  ],
+  "volumes": [
+    {
+      "name": "cws-instrumentation-volume"
+    }
+  ],
+  "networkMode": "awsvpc",
+  "placementConstraints": [],
+  "family": "nginx",
+  "memory": "512",
+  "cpu": "256",
+  "pidMode": "task"
+}

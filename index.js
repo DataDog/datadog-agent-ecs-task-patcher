@@ -29,7 +29,7 @@ readFile(pathOrStdin, 'utf8', (err, rawData) => {
     }
 
     if (!options.entryPoint) {
-        console.error("⚠️  entry point not provided, using default value : '/init.sh'\n");
+        console.error("⚠️  entry point not provided, using default value : '/init.sh'");
         options.entryPoint = '["/init.sh"]';
     }
 
@@ -62,6 +62,9 @@ readFile(pathOrStdin, 'utf8', (err, rawData) => {
     }
 
     if (!options.output) {
+        if (options.verbose) {
+            console.log("");
+        }
         console.log(output);
     } else {
         writeFile(options.output, output, err => {

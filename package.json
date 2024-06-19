@@ -4,7 +4,7 @@
   "description": "Datadog Agent ECS task definition patcher",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "mocha"
   },
   "author": "Sylvain Afchain",
   "license": "Apache-2.0",
@@ -12,6 +12,7 @@
     "datadog-agent-ecs-task-patcher": "./index.js"
   },
   "dependencies": {
+    "mocha": "^10.4.0",
     "yaml": "^2.4.1",
     "yargs": "13.2"
   },
