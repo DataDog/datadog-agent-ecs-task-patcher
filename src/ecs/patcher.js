@@ -30,7 +30,7 @@ function addDatadogSidecar(containersDef, apiKey, site, service = "", ddAgentImg
         console.log("📦 add Datadog agent sidecar");
     }
 
-    if (ddAgentImg == "") {
+    if (ddAgentImg === "") {
         ddAgentImg = defaultDDAgentImg;
     }
 
@@ -191,7 +191,7 @@ function patchContainerEntryPoint(containerDef, entryPoint = [], verbose = false
     }
 
     if (!('entryPoint' in containerDef)) {
-        if (entryPoint.length == 0) {
+        if (entryPoint.length === 0) {
             entryPoint = RetrieveEntrypoint(containerDef.image, verbose)
         }
 

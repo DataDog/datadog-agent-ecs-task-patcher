@@ -1,30 +1,30 @@
 import assert from "assert";
 import { PatchRawTaskDef } from "../src/ecs/patcher.js";
 import { PatchRawDeployment } from "../src/eks/patcher.js";
-import { readFile } from 'node:fs';
+import { readFileSync } from 'node:fs';
 
-function assertTaskDefEqual(actual, expected) {
-    readFile(actual, 'utf8', (err, rawData) => {
-        assert.equal(err, null);
-
+ function assertTaskDefEqual(actual, expected) {
+    try {
+        let rawData = readFileSync(actual, { encoding: 'utf8', flag: 'r' })
         let output = PatchRawTaskDef(rawData, "aaa", "bbb", "ccc", ["/entry.sh"], "", "", [], false);
-        readFile(expected, 'utf8', (err, rawData) => {
-            assert.equal(err, null);
-            assert.deepEqual(output, rawData);
-        })
-    })
+
+        rawData = readFileSync(expected, { encoding: 'utf8', flag: 'r' })
+        assert.deepEqual(output, rawData);
+    } catch(err) {
+        assert.equal(err, null);
+    }
 }
 
 function assertDeploymentEqual(actual, expected) {
-    readFile(actual, 'utf8', (err, rawData) => {
-        assert.equal(err, null);
-
+    try {
+        let rawData = readFileSync(actual, { encoding: 'utf8', flag: 'r' })
         let output = PatchRawDeployment(rawData, "aaa", "bbb", "ccc", ["/entry.sh"], "", "", [], false);
-        readFile(expected, 'utf8', (err, rawData) => {
-            assert.equal(err, null);
-            assert.deepEqual(output, rawData);
-        })
-    })
+
+        rawData = readFileSync(expected, { encoding: 'utf8', flag: 'r' })
+        assert.deepEqual(output, rawData);
+    } catch(err) {
+        assert.equal(err, null);
+    }
 }
 
 describe('ECS', function () {
@@ -57,6 +57,12 @@ describe('EKS', function () {
     describe('with-sidecar', function () {
         it('should generate the expected output', function () {
             assertDeploymentEqual("./test/data/eks/with-sidecar-input-1.yaml", "./test/data/eks/with-sidecar-output-1.yaml");
+        });
+    });
+
+    describe('multi-yaml', function () {
+        it('should generate the expected output', function () {
+            assertDeploymentEqual("./test/data/eks/multi-input-1.yaml", "./test/data/eks/multi-output-1.yaml");
         });
     });
 });

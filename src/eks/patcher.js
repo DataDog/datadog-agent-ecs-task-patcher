@@ -30,7 +30,7 @@ function addDatadogSidecar(spec, apiKey, site, service = "", ddAgentImg = "", ve
         console.log("📦 add Datadog agent sidecar");
     }
 
-    if (ddAgentImg == "") {
+    if (ddAgentImg === "") {
         ddAgentImg = defaultDDAgentImg;
     }
 
@@ -142,7 +142,7 @@ function patchContainerEntryPoint(spec, entryPoint = [], verbose = false) {
     }
 
     if (!('command' in spec)) {
-        if (entryPoint.length == 0) {
+        if (entryPoint.length === 0) {
             entryPoint = RetrieveEntrypoint(spec.image, verbose)
         }
 
@@ -228,21 +228,22 @@ export function PatchDeployment(deployment, apiKey, site, service = "", entryPoi
 }
 
 export function PatchRawDeployment(rawDeployment, apiKey, site, service, entryPoint = [], agentImg = "", cwsInstImg = "", ctnrNames = [], verbose = false) {
-    let deployment;
-    let json = false;
-
     try {
-        deployment = JSON.parse(rawDeployment);
-        json = true
-    } catch {
-        deployment = YAML.parse(rawDeployment);
-    }
-
-    let result = PatchDeployment(deployment, apiKey, site, service, entryPoint, agentImg, cwsInstImg, ctnrNames, verbose);
-
-    if (json) {
+        let deployment = JSON.parse(rawDeployment);
+        let result = PatchDeployment(deployment, apiKey, site, service, entryPoint, agentImg, cwsInstImg, ctnrNames, verbose);
         return JSON.stringify(result, null, 2);
+    } catch {
+        let result = '';
+        let documents = YAML.parseAllDocuments(rawDeployment);
+        for (let doc of documents) {
+            let obj = doc.toJS();
+            if (obj.kind === "Deployment") {
+                let res = PatchDeployment(obj, apiKey, site, service, entryPoint, agentImg, cwsInstImg, ctnrNames, verbose);
+                result += YAML.stringify(res, null, 2);
+            } else {
+                result += doc.toString();
+            }
+        }
+        return result;
     }
-
-    return YAML.stringify(result, null, 2);
 }
