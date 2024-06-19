@@ -1,0 +1,201 @@
+{
+  "family": "appmesh-gateway",
+  "runtimePlatform": {
+    "operatingSystemFamily": "LINUX"
+  },
+  "proxyConfiguration": {
+    "type": "APPMESH",
+    "containerName": "envoy",
+    "properties": [
+      {
+        "name": "IgnoredUID",
+        "value": "1337"
+      },
+      {
+        "name": "ProxyIngressPort",
+        "value": "15000"
+      },
+      {
+        "name": "ProxyEgressPort",
+        "value": "15001"
+      },
+      {
+        "name": "AppPorts",
+        "value": "9080"
+      },
+      {
+        "name": "EgressIgnoredIPs",
+        "value": "169.254.170.2,169.254.169.254"
+      }
+    ]
+  },
+  "containerDefinitions": [
+    {
+      "name": "app",
+      "image": "application_image",
+      "portMappings": [
+        {
+          "containerPort": 9080,
+          "hostPort": 9080,
+          "protocol": "tcp"
+        }
+      ],
+      "essential": true,
+      "dependsOn": [
+        {
+          "containerName": "envoy",
+          "condition": "HEALTHY"
+        },
+        {
+          "containerName": "datadog-agent",
+          "condition": "HEALTHY"
+        },
+        {
+          "containerName": "cws-instrumentation-init",
+          "condition": "SUCCESS"
+        }
+      ],
+      "linuxParameters": {
+        "capabilities": {
+          "add": [
+            "SYS_PTRACE"
+          ]
+        }
+      },
+      "entryPoint": [
+        "/cws-instrumentation-volume/cws-instrumentation",
+        "trace",
+        "--",
+        "/entry.sh"
+      ],
+      "mountPoints": [
+        {
+          "sourceVolume": "cws-instrumentation-volume",
+          "containerPath": "/cws-instrumentation-volume",
+          "readOnly": true
+        }
+      ]
+    },
+    {
+      "name": "envoy",
+      "image": "840364872350.dkr.ecr.region-code.amazonaws.com/aws-appmesh-envoy:v1.15.1.0-prod",
+      "essential": true,
+      "environment": [
+        {
+          "name": "APPMESH_VIRTUAL_NODE_NAME",
+          "value": "mesh/meshName/virtualNode/virtualNodeName"
+        },
+        {
+          "name": "ENVOY_LOG_LEVEL",
+          "value": "info"
+        }
+      ],
+      "healthCheck": {
+        "command": [
+          "CMD-SHELL",
+          "echo hello"
+        ],
+        "interval": 5,
+        "timeout": 2,
+        "retries": 3
+      },
+      "linuxParameters": {
+        "capabilities": {
+          "add": [
+            "SYS_PTRACE"
+          ]
+        }
+      },
+      "dependsOn": [
+        {
+          "containerName": "datadog-agent",
+          "condition": "HEALTHY"
+        },
+        {
+          "containerName": "cws-instrumentation-init",
+          "condition": "SUCCESS"
+        }
+      ],
+      "entryPoint": [
+        "/cws-instrumentation-volume/cws-instrumentation",
+        "trace",
+        "--",
+        "/entry.sh"
+      ],
+      "mountPoints": [
+        {
+          "sourceVolume": "cws-instrumentation-volume",
+          "containerPath": "/cws-instrumentation-volume",
+          "readOnly": true
+        }
+      ]
+    },
+    {
+      "image": "public.ecr.aws/datadog/agent:latest",
+      "name": "datadog-agent",
+      "environment": [
+        {
+          "name": "DD_API_KEY",
+          "value": "aaa"
+        },
+        {
+          "name": "DD_SITE",
+          "value": "bbb"
+        },
+        {
+          "name": "ECS_FARGATE",
+          "value": "true"
+        },
+        {
+          "name": "DD_RUNTIME_SECURITY_CONFIG_ENABLED",
+          "value": "true"
+        },
+        {
+          "name": "DD_RUNTIME_SECURITY_CONFIG_EBPFLESS_ENABLED",
+          "value": "true"
+        },
+        {
+          "name": "DD_SERVICE",
+          "value": "ccc"
+        }
+      ],
+      "healthCheck": {
+        "command": [
+          "CMD-SHELL",
+          "/probe.sh"
+        ],
+        "interval": 30,
+        "timeout": 5,
+        "retries": 2,
+        "startPeriod": 60
+      }
+    },
+    {
+      "name": "cws-instrumentation-init",
+      "image": "public.ecr.aws/datadog/cws-instrumentation:latest",
+      "essential": false,
+      "user": "0",
+      "command": [
+        "/cws-instrumentation",
+        "setup",
+        "--cws-volume-mount",
+        "/cws-instrumentation-volume"
+      ],
+      "mountPoints": [
+        {
+          "sourceVolume": "cws-instrumentation-volume",
+          "containerPath": "/cws-instrumentation-volume",
+          "readOnly": false
+        }
+      ]
+    }
+  ],
+  "executionRoleArn": "arn:aws:iam::123456789012:role/ecsTaskExecutionRole",
+  "networkMode": "awsvpc",
+  "volumes": [
+    {
+      "name": "cws-instrumentation-volume"
+    }
+  ],
+  "pidMode": "task"
+}

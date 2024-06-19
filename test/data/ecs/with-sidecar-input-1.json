@@ -23,6 +23,38 @@
           "awslogs-stream-prefix": "ecs"
         }
       }
+    },
+    {
+      "image": "public.ecr.aws/datadog/agent:latest",
+      "name": "datadog-agent",
+      "environment": [
+        {
+          "name": "DD_API_KEY",
+          "value": "123"
+        },
+        {
+          "name": "DD_SITE",
+          "value": "456"
+        },
+        {
+          "name": "ECS_FARGATE",
+          "value": "true"
+        },
+        {
+          "name": "DD_SERVICE",
+          "value": "789"
+        }
+      ],
+      "healthCheck": {
+        "command": [
+          "CMD-SHELL",
+          "/probe.sh"
+        ],
+        "interval": 30,
+        "timeout": 5,
+        "retries": 2,
+        "startPeriod": 60
+      }
     }
   ],
   "volumes": [],

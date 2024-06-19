@@ -241,8 +241,8 @@ export function PatchRawDeployment(rawDeployment, apiKey, site, service, entryPo
     let result = PatchDeployment(deployment, apiKey, site, service, entryPoint, agentImg, cwsInstImg, ctnrNames, verbose);
 
     if (json) {
-        return JSON.stringify(result, null, 4);
+        return JSON.stringify(result, null, 2);
     }
 
-    return YAML.stringify(result, null, 4);
+    return YAML.stringify(result, null, 2);
 }

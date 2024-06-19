@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: eks-nginx-deployment
+  namespace: dev
+  labels:
+    app: eks-nginx-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: eks-nginx-app
+  template:
+    metadata:
+      labels:
+        app: eks-nginx-app
+    spec:
+      containers:
+        - name: nginx
+          image: nginx:latest
+        - image: public.ecr.aws/datadog/agent:latest
+          name: datadog-agent
+          env:
+            - name: DD_API_KEY
+              value: 123
+            - name: DD_SITE
+              value: 456
+            - name: DD_EKS_FARGATE
+              value: "true"
+            - name: DD_SERVICE
+              value: 789
+            - name: DD_KUBERNETES_KUBELET_NODENAME
+              valueFrom:
+                fieldRef:
+                  apiVersion: v1
+                  fieldPath: spec.nodeName
