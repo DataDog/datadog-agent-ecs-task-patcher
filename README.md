@@ -49,6 +49,21 @@ The `datadog-agent-ecs-task-patcher` makes the following modifications to the ta
     - Add the `cws-instrumentation` volume.
     - Wrap the application's entry point with the `cws-instrumentation` binary.
 
+## Where to find the entry point
+
+
+You can use the following command to find the entry point of your workload:
+
+```
+docker inspect <YOUR_APP_IMAGE> -f '{{json .Config.Entrypoint}}'
+```
+
+or
+
+```
+docker inspect <YOUR_APP_IMAGE> -f '{{json .Config.Cmd}}'
+```
+
 ## Examples
 
 ### ECS with Nginx
