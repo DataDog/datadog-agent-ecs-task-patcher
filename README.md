@@ -51,8 +51,9 @@ The `datadog-agent-ecs-task-patcher` makes the following modifications to the ta
 
 ## Where to find the entry point
 
+If you don't specify an `entry point`, the `datadog-agent-ecs-task-patcher` will try to detect it by pulling the image.
 
-You can use the following command to find the entry point of your workload:
+You can also use the following command to manually find the entry point of your workload:
 
 ```
 docker inspect <YOUR_APP_IMAGE> -f '{{json .Config.Entrypoint}}'

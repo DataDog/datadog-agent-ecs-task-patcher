@@ -41,5 +41,8 @@ export function RetrieveEntrypoint(image, verbose = false) {
     })
 
     let output = execSync(`docker inspect ${image} -f '{{json .Config.Entrypoint}}'`).toString();
+    if (!output) {
+        execSync(`docker inspect ${image} -f '{{json .Config.Cmd}}'`).toString();
+    }
     return JSON.parse(output);
 }
