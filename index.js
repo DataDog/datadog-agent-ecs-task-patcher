@@ -13,7 +13,7 @@ const options = yargs.usage("Usage: -a <api key> -e '[<entry point>]'")
     .option("v", { alias: "verbose", describe: "Enable verbose mode", type: "boolean", demandOption: false })
     .option("n", { alias: "service", describe: "Service name", type: "string", demandOption: false })
     .option("p", { alias: "containers", describe: "Container names to patch", type: "string", array: true, demandOption: false })
-    .option("e", { alias: "entryPoint", describe: "Entry point arguments", type: "string", demandOption: false })
+    .option("e", { alias: "entryPoint", describe: "Entry point arguments", type: "string", demandOption: false, default: '[]' })
     .option("d", { alias: "agentImage", describe: "Datadog Agent image", type: "string", demandOption: false, default: "public.ecr.aws/datadog/agent:latest" })
     .option("c", { alias: "cwsInstImage", describe: "CWS instrumentation image", type: "string", demandOption: false, default: "public.ecr.aws/datadog/cws-instrumentation:latest" })
     .option("k", { alias: "eks", describe: "Enable EKS deployment mode", type: "bool", demandOption: false })
@@ -28,12 +28,10 @@ readFile(pathOrStdin, 'utf8', (err, rawData) => {
         return;
     }
 
-    if (!options.entryPoint) {
-        console.error("⚠️  entry point not provided, using default value : '/init.sh'");
-        options.entryPoint = '["/init.sh"]';
-    }
-
     let entryPoint = JSON.parse(options.entryPoint);
+    if (!entryPoint.length) {
+        console.error("⚠️  entry point not provided, will try to detect");
+    }
 
     let output = "";
 
