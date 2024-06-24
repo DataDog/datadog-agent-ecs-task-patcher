@@ -85,6 +85,12 @@ To apply the instrumentation to a specific container:
 -e '["/docker-entrypoint.sh", "nginx", "-g", "daemon off;"]'
  ```
 
+ To use the entry point detection.
+
+ ```
+ cat examples/nginx-ecs-td.json | docker run -i -v /var/run/docker.sock:/var/run/docker.sock datadog/datadog-agent-ecs-task-patcher:latest datadog-agent-ecs-task-patcher -a <API-KEY>
+ ```
+
  ### EKS deployment with Nginx
 
 > **Warning**: Use the following [Agent RBAC deployment instruction](https://docs.datadoghq.com/integrations/eks_fargate/?tab=manual#aws-eks-fargate-rbac) before deploying the Agent as a sidecar.
