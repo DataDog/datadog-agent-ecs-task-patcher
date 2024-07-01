@@ -4,13 +4,6 @@
 
 The `datadog-agent-ecs-task-patcher` is a tool that patches existing task definitions to integrate the Datadog Agent as a sidecar and apply Cloud Workload Security (CWS) instrumentation to your application.
 
-## Build the Docker image
-
-To build the Docker image, run:
-
-```
-docker build . -t datadog/datadog-agent-ecs-task-patcher:latest
-```
 
 ## Usage
 
@@ -101,3 +94,11 @@ To apply the instrumentation to all containers:
  cat examples/nginx-eks.yaml | docker run -i datadog/datadog-agent-ecs-task-patcher:latest datadog-agent-ecs-task-patcher -k -a <API-KEY> \
 -e '["/docker-entrypoint.sh", "nginx", "-g", "daemon off;"]'
  ```
+
+## Build the Docker image
+
+To build the Docker image, run:
+
+```
+docker build . -t datadog/datadog-agent-ecs-task-patcher:latest
+```
