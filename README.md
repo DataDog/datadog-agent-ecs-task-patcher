@@ -1,6 +1,6 @@
 # datadog-agent-ecs-task-patcher
 
-> **Warning**: This tool is not production-ready. Carefully review the generated output.
+> **Warning**: Carefully review the generated output.
 
 The `datadog-agent-ecs-task-patcher` is a tool that patches existing task definitions to integrate the Datadog Agent as a sidecar and apply Cloud Workload Security (CWS) instrumentation to your application.
 
